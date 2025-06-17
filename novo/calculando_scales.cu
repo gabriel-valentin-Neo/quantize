@@ -92,7 +92,7 @@ __global__ void __launch_bounds__(MXFP8_THREADS_PER_CHUNK) cast_mxfp8_col_row_wi
                 float max_val = 0.0;
                 float elt;
                 for(int i = 0; i < 32; i++){
-                    elt = fabsf(static_cast<float>(input[atual][i][tx]));
+                    elt = fabsf(__bfloat162float(input[atual][i][tx]));
                     max_val = elt > max_val ? elt : max_val;
                 }
                 const e8m0_t biased_exponent =
@@ -102,7 +102,7 @@ __global__ void __launch_bounds__(MXFP8_THREADS_PER_CHUNK) cast_mxfp8_col_row_wi
 
                 for(int i = 0; i < 32; ++i) {
                     output_colwise_sh[atual][i][tx] =
-                        static_cast<OType>(static_cast<float>(input[atual][i][tx]) * block_scale_inverse);
+                        static_cast<OType>(__bfloat162float(input[atual][i][tx]) * block_scale_inverse);
                 }
 
                 ptx::fence_proxy_async_shared_cta();
@@ -136,7 +136,7 @@ __global__ void __launch_bounds__(MXFP8_THREADS_PER_CHUNK) cast_mxfp8_col_row_wi
                 int dim_y =  threadIdx.x/2;
                 float elt;
                 for(int i = 0; i < 32; i++){
-                    elt = fabsf(static_cast<float>(input[atual][dim_y][dim_x + i]));
+                    elt = fabsf(__bfloat162float(input[atual][dim_y][dim_x + i]));
                     max_val = elt > max_val ? elt : max_val;
                     
                 }
@@ -146,7 +146,7 @@ __global__ void __launch_bounds__(MXFP8_THREADS_PER_CHUNK) cast_mxfp8_col_row_wi
                 const float block_scale_inverse = exp2f_rcp(biased_exponent);
                 for(int j = 0; j < 32; j++){
                     output_rowwise_sh[atual][dim_y][dim_x + j] =
-                        static_cast<OType>(static_cast<float>(input[atual][dim_y][dim_x + j]) * block_scale_inverse);
+                        static_cast<OType>(__bfloat162float(input[atual][dim_y][dim_x + j]) * block_scale_inverse);
                 }
                 ptx::fence_proxy_async_shared_cta();
                 __syncthreads();
