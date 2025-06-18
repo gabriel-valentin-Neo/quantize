@@ -150,11 +150,6 @@ __forceinline__ __device__ void destroy_barriers(uint64_t *mbar, const bool is_m
 
 }
 
-template <size_t W>
-__device__ __forceinline__ void cp_async_bulk_wait_group_read() {
-  asm volatile("cp.async.bulk.wait_group.read 0;");
-}
-
 }
 
 
