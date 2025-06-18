@@ -142,7 +142,7 @@ __forceinline__ __device__ void destroy_barriers(uint64_t *mbar, const bool is_m
   // further computations were to take place in the kernel, this allows the
   // memory location of the shared memory barrier to be reused.
   if (is_master_thread) {
-#pragma unroll
+    #pragma unroll
     for (int iter = 0; iter < num_barriers; ++iter) {
       ptx::mbarrier_invalid(&mbar[iter]);
     }
@@ -150,7 +150,14 @@ __forceinline__ __device__ void destroy_barriers(uint64_t *mbar, const bool is_m
 
 }
 
+template <size_t W>
+__device__ __forceinline__ void cp_async_bulk_wait_group_read() {
+  asm volatile("cp.async.bulk.wait_group.read 0;");
+}
 
 }
+
+
+
 
 #endif
